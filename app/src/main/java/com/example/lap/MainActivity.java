@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.example.lap.adapter.DepartmentAdapter;
 import com.example.lap.model.Department;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Department selectedDepartment;
     private byte indexSelected;
 
-    private ArrayList<Employee> dataEmployee;
+    private ArrayList<Employee> dataEmployees;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // init
         dataDepartments = new ArrayList<Department>();
-        dataEmployee = new ArrayList<Employee>();
-        adapterDepartment = new DepartmentAdapter(this, dataDepartments);
+        dataEmployees = new ArrayList<Employee>();
+        adapterDepartment = new DepartmentAdapter(this, dataDepartments, dataEmployees);
 
         list_department = findViewById(R.id.list_department);
         code_department = findViewById(R.id.code_department_input);
@@ -132,8 +133,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Xử lý sự kiện khi người dùng nhấn nút "Danh sách nhân viên"
                 // ...
-//                Intent intent = new Intent(MainActivity.this, ListEmployee.class);
-//                startActivity(intent);
+                Bundle extra = new Bundle();
+                extra.putSerializable("data_employees", dataEmployees);
+                Intent intent = new Intent(MainActivity.this, ListEmployee.class);
+//                intent.putExtra("data_departments", dataDepartments);
+//                for (int i = 0; i < dataEmployees.size(); i++) {
+//                    intent.putExtra("data_employees" + i, dataEmployees.get(i).getName());
+//                    Log.d("ArrayLog", "Element at index " + i + ": " + dataEmployees.get(i).getName());
+//                }
+                intent.putExtra("extra", extra);
+                startActivity(intent);
                 dialog_department.dismiss(); // Đóng popup
             }
         });
@@ -174,9 +183,14 @@ public class MainActivity extends AppCompatActivity {
                         male = 2;
                     }
                     Employee employee = new Employee(name, code, male, (byte)3, selectedDepartment.getCode());
-                    dataEmployee.add(employee);
+                    dataEmployees.add(employee);
+                    adapterDepartment.notifyDataSetInvalidated();
+                    dialog_add_employee.dismiss(); // Đóng popup
+                    dialog_department.show();
+                } else {
+//                    thong bao
+                    Toast.makeText(MainActivity.this, "Nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 }
-                dialog_add_employee.dismiss(); // Đóng popup
             }
         });
     }
