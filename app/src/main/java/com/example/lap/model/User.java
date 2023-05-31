@@ -1,24 +1,14 @@
 package com.example.lap.model;
 
 public class User {
-    private int id;
     private String name;
     private String code;
-    private byte gender;
+    private byte gender; // 1 : nam , 2: nữ
 
-    public User(int id, String name, String code, byte gender) {
-        this.id = id;
+    public User(String name, String code, byte gender) {
         this.name = name;
         this.code = code;
         this.gender = gender;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

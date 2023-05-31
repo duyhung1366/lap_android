@@ -1,0 +1,42 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/addEmployeeButton"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Thêm nhân viên"
+        android:textAlignment="textStart"
+        />
+
+    <Button
+        android:id="@+id/employeeListButton"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Danh sách nhân viên"
+        android:textAlignment="textStart"
+        />
+
+    <Button
+        android:id="@+id/createManagerButton"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Lập trưởng phòng"
+        android:textAlignment="textStart"
+        />
+
+    <Button
+        android:id="@+id/deleteDepartmentButton"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Xóa phòng ban"
+        android:textAlignment="textStart"
+        />
+
+</LinearLayout>
