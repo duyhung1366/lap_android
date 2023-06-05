@@ -3,13 +3,11 @@ package com.example.lap;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -19,10 +17,13 @@ import android.widget.Toast;
 import com.example.lap.adapter.DepartmentAdapter;
 import com.example.lap.model.Department;
 import com.example.lap.model.Employee;
+import com.example.lap.util.AppUtil;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int MY_REQUEST_CODE = 10;
 
     private ListView list_department;
     private EditText code_department;
@@ -37,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private byte indexSelected;
 
     private ArrayList<Employee> dataEmployees;
+
+    private EditText code_employee;
+    private EditText name_employee;
+    RadioButton gender_male_employee;
+    RadioButton gender_female_employee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +72,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button save_employee = dialog_add_employee.findViewById(R.id.add_employee_btn);
         Button clearText_employee = dialog_add_employee.findViewById(R.id.remove_text_btn);
-        EditText code_employee = dialog_add_employee.findViewById(R.id.code_employee);
-        EditText name_employee = dialog_add_employee.findViewById(R.id.name_employee);
-        RadioButton gender_male_employee = dialog_add_employee.findViewById(R.id.gender_male_employee);
-        RadioButton gender_female_employee = dialog_add_employee.findViewById(R.id.gender_female_employee);
+        code_employee = dialog_add_employee.findViewById(R.id.code_employee);
+        name_employee = dialog_add_employee.findViewById(R.id.name_employee);
+        gender_male_employee = dialog_add_employee.findViewById(R.id.gender_male_employee);
+        gender_female_employee = dialog_add_employee.findViewById(R.id.gender_female_employee);
 
         list_department.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -110,9 +116,8 @@ public class MainActivity extends AppCompatActivity {
                         // update
                         dataDepartments.set(index, new Department(id, name));
                     }
+                    clearTextDepartment();
                     adapterDepartment.notifyDataSetChanged();
-                    name_department.setText("");
-                    code_department.setText("");
                 }
             }
         });
@@ -122,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Xử lý sự kiện khi người dùng nhấn nút "Thêm nhân viên"
                 // ...
-                Log.d("TAG", "selected data: " + selectedDepartment.getName().toString());
+//                Log.d("TAG", "selected data: " + selectedDepartment.getName().toString());
                 dialog_add_employee.show();
                 dialog_department.dismiss(); // Đóng popup
             }
@@ -133,15 +138,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Xử lý sự kiện khi người dùng nhấn nút "Danh sách nhân viên"
                 // ...
-                Bundle extra = new Bundle();
-                extra.putSerializable("data_employees", dataEmployees);
-                Intent intent = new Intent(MainActivity.this, ListEmployee.class);
-//                intent.putExtra("data_departments", dataDepartments);
-//                for (int i = 0; i < dataEmployees.size(); i++) {
-//                    intent.putExtra("data_employees" + i, dataEmployees.get(i).getName());
-//                    Log.d("ArrayLog", "Element at index " + i + ": " + dataEmployees.get(i).getName());
-//                }
-                intent.putExtra("extra", extra);
+                Intent intent = new Intent(MainActivity.this, ListEmployeeActivity.class);
+//                Bundle extra = new Bundle();
+//                extra.putSerializable("data_employees", dataEmployees);
+//                intent.putExtras(extra);
+
+                // filter employees by code department
+
+                AppUtil.dataEmployees = dataEmployees;
+                AppUtil.dataEmployeesByCodeDepartment = fillterByCodeDepartment(selectedDepartment.getCode());
+                AppUtil.dataDepartments = dataDepartments;
                 startActivity(intent);
                 dialog_department.dismiss(); // Đóng popup
             }
@@ -177,22 +183,70 @@ public class MainActivity extends AppCompatActivity {
                 String name = name_employee.getText().toString();
                 byte male = 1;
                 if(!code.equals("") && !name.equals("") && (gender_female_employee.isChecked() || gender_male_employee.isChecked())) {
-                    if(gender_male_employee.isChecked()) {
-                        male = 1;
+                    if(findIndexEmployeeByCode(code) != -1) {
+                        // Tồn tại
+                        Toast.makeText(MainActivity.this, "Mã code đã tồn tại, chọn mã khác", Toast.LENGTH_SHORT).show();
                     } else {
-                        male = 2;
+                        if(gender_male_employee.isChecked()) {
+                            male = 1;
+                        } else {
+                            male = 2;
+                        }
+                        Employee employee = new Employee(name, code, male, (byte)3, selectedDepartment.getCode());
+                        dataEmployees.add(employee);
+                        adapterDepartment.notifyDataSetInvalidated();
+                        dialog_add_employee.dismiss(); // Đóng popup
+                        dialog_department.show();
+                        clearTextEmployee();
                     }
-                    Employee employee = new Employee(name, code, male, (byte)3, selectedDepartment.getCode());
-                    dataEmployees.add(employee);
-                    adapterDepartment.notifyDataSetInvalidated();
-                    dialog_add_employee.dismiss(); // Đóng popup
-                    dialog_department.show();
                 } else {
 //                    thong bao
                     Toast.makeText(MainActivity.this, "Nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        clearText_employee.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearTextEmployee();
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(AppUtil.dataDepartments.size() > 0) {
+            dataDepartments = AppUtil.dataDepartments;
+            adapterDepartment.notifyDataSetChanged();
+        }
+        if(AppUtil.dataEmployees.size() > 0) {
+            dataEmployees = AppUtil.dataEmployees;
+            adapterDepartment.notifyDataSetChanged();
+        }
+        clearTextDepartment();
+    }
+
+    private void clearTextDepartment() {
+        name_department.setText("");
+        code_department.setText("");
+    }
+
+    private void clearTextEmployee() {
+        code_employee.setText("");
+        name_employee.setText("");
+        gender_female_employee.setChecked(false);
+        gender_male_employee.setChecked(false);
+    }
+
+    private int findIndexEmployeeByCode(String code) {
+        for (int i = 0; i < dataEmployees.size(); i++) {
+            if (dataEmployees.get(i).getCode().equals(code)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static int findIndex(ArrayList<Department> list, String target) {
@@ -202,5 +256,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return -1;
+    }
+
+    private ArrayList<Employee> fillterByCodeDepartment(String codeDepartment) {
+        ArrayList<Employee> resultfillter = new ArrayList<>();
+        for (Employee employee : dataEmployees) {
+            if (employee.getCodeDepartment().equals(codeDepartment)) {
+                resultfillter.add(employee);
+            }
+        }
+
+        return resultfillter;
     }
 }

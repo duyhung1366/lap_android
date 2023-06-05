@@ -1,8 +1,6 @@
 package com.example.lap.model;
 
-import java.io.Serializable;
-
-public class Employee extends User implements Serializable {
+public class Employee extends User {
 
     private byte role;
     /*
