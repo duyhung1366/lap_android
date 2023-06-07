@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.lap.R;
 import com.example.lap.model.Department;
 import com.example.lap.model.Employee;
+import com.example.lap.util.AppUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +19,14 @@ import java.util.List;
 public class DepartmentAdapter extends BaseAdapter {
     private Context context;
     private List<Department> departmentList;
-    private List<Employee> employeeList;
+    private ArrayList<Employee> employeeList;
 
     public DepartmentAdapter(Context context, List<Department> departmentList) {
         this.context = context;
         this.departmentList = departmentList;
     }
 
-    public DepartmentAdapter(Context context, List<Department> departmentList, List<Employee> employeeList) {
+    public DepartmentAdapter(Context context, List<Department> departmentList, ArrayList<Employee> employeeList) {
         this.context = context;
         this.departmentList = departmentList;
         this.employeeList = employeeList;
@@ -57,7 +58,7 @@ public class DepartmentAdapter extends BaseAdapter {
         Department department = departmentList.get(position);
         if (department != null) {
             String departmentName
-                    = department.getCode() + " - " + department.getName() + "( có : " + employeeList.size() + " nhân viên )"
+                    = department.getCode() + " - " + department.getName() + "( có : " + AppUtil.fillterEmployeeByCodeDepartment(department.getCode(), employeeList).size() + " nhân viên )"
                     + "\n Trưởng phòng : [" + getNameByRoleDepartment(department, (byte)1) + "]"
                     + "\n Phó phòng :" + getNameByRoleDepartment(department, (byte)2);
             departmentNameTextView.setText(departmentName);

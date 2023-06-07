@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     RadioButton gender_male_employee;
     RadioButton gender_female_employee;
 
+    private ArrayList<Employee> dataEmployeesSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         gender_male_employee = dialog_add_employee.findViewById(R.id.gender_male_employee);
         gender_female_employee = dialog_add_employee.findViewById(R.id.gender_female_employee);
 
+        dataEmployeesSelected = new ArrayList<Employee>();
+
         list_department.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -95,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 Department selected = dataDepartments.get(position);
                 selectedDepartment = selected;
                 indexSelected = (byte)position;
+                dataEmployeesSelected = AppUtil.fillterEmployeeByCodeDepartment(selectedDepartment.getCode().toString(), dataEmployees);
                 return false;
             }
         });
@@ -146,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 // filter employees by code department
 
                 AppUtil.dataEmployees = dataEmployees;
-                AppUtil.dataEmployeesByCodeDepartment = fillterByCodeDepartment(selectedDepartment.getCode());
+                AppUtil.dataEmployeesSelected = AppUtil.fillterEmployeeByCodeDepartment(selectedDepartment.getCode(), dataEmployees);
                 AppUtil.dataDepartments = dataDepartments;
                 startActivity(intent);
                 dialog_department.dismiss(); // Đóng popup
@@ -241,8 +246,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private int findIndexEmployeeByCode(String code) {
-        for (int i = 0; i < dataEmployees.size(); i++) {
-            if (dataEmployees.get(i).getCode().equals(code)) {
+        for (int i = 0; i < dataEmployeesSelected.size(); i++) {
+            if (dataEmployeesSelected.get(i).getCode().equals(code)) {
                 return i;
             }
         }
@@ -256,16 +261,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return -1;
-    }
-
-    private ArrayList<Employee> fillterByCodeDepartment(String codeDepartment) {
-        ArrayList<Employee> resultfillter = new ArrayList<>();
-        for (Employee employee : dataEmployees) {
-            if (employee.getCodeDepartment().equals(codeDepartment)) {
-                resultfillter.add(employee);
-            }
-        }
-
-        return resultfillter;
     }
 }
