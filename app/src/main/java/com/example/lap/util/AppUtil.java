@@ -2,6 +2,7 @@ package com.example.lap.util;
 
 import com.example.lap.model.Department;
 import com.example.lap.model.Employee;
+
 import java.util.ArrayList;
 
 public class AppUtil {
@@ -27,6 +28,10 @@ public class AppUtil {
             }
         }
         return -1;
+    }
+
+    public static void updateDataEmployees(Employee employeeBefore, Employee employeeUpdate) {
+        dataEmployees.set(dataEmployees.indexOf(employeeBefore), employeeUpdate);
     }
 
 }

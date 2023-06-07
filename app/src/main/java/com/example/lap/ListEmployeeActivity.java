@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lap.adapter.EmployeeAdapter;
@@ -39,6 +40,7 @@ public class ListEmployeeActivity extends AppCompatActivity {
     private EditText code_employee;
     private RadioButton gender_male_employee;
     private RadioButton gender_female_employee;
+    private TextView titleEditEmployee;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class ListEmployeeActivity extends AppCompatActivity {
         dialog_employee.setContentView(R.layout.popup_setting_employee);
 
         editEmployeeBtn = dialog_employee.findViewById(R.id.editEmployee);
+        removeEmployee = dialog_employee.findViewById(R.id.removeEmployee);
 
         Button save_employee = dialog_edit_employee.findViewById(R.id.add_employee_btn);
         Button clearText_employee = dialog_edit_employee.findViewById(R.id.remove_text_btn);
@@ -64,6 +67,9 @@ public class ListEmployeeActivity extends AppCompatActivity {
         code_employee = dialog_edit_employee.findViewById(R.id.code_employee);
         gender_male_employee = dialog_edit_employee.findViewById(R.id.gender_male_employee);
         gender_female_employee = dialog_edit_employee.findViewById(R.id.gender_female_employee);
+        titleEditEmployee = dialog_edit_employee.findViewById(R.id.title_update_employee);
+
+        titleEditEmployee.setText("Sửa Nhân Viên");
 
         listView_employees.setAdapter(adapterEmployee);
 
@@ -127,11 +133,11 @@ public class ListEmployeeActivity extends AppCompatActivity {
                         }
                         Employee employee = new Employee(name, code, male, (byte)3, employeeSelected.getCodeDepartment());
                         dataEmployees.set(indexEmployeeSelected, employee);
-                        AppUtil.dataEmployeesSelected.set(indexEmployeeSelected, employee);
+                        AppUtil.updateDataEmployees(employeeSelected, employee);
                         employeeSelected = employee;
                         adapterEmployee.notifyDataSetChanged();
                         dialog_edit_employee.dismiss();
-
+                        dialog_employee.dismiss();
                     }
                 } else {
 //                    thong bao
@@ -139,5 +145,26 @@ public class ListEmployeeActivity extends AppCompatActivity {
                 }
             }
         });
+
+        clearText_employee.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                code_employee.setText("");
+                name_employee.setText("");
+                gender_female_employee.setChecked(false);
+                gender_male_employee.setChecked(false);
+            }
+        });
+
+        removeEmployee.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dataEmployees.remove(indexEmployeeSelected);
+                AppUtil.dataEmployees.remove(AppUtil.dataEmployees.indexOf(employeeSelected));
+                adapterEmployee.notifyDataSetChanged();
+                dialog_employee.dismiss();
+            }
+        });
     }
+
 }
